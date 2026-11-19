@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set Match – Nail Service Matcher &amp; Booking Requests (Prototype)</title>
+<style>
+:root{--wine:#8e4b5c;--wine2:#a5606f;--blush:#f7e6ea;--pinksel:#ecc8d1;--cream:#faf6f2;--ink:#3a2f2c;--muted:#7a6a66;--line:#eaddd6;
+--ok:#1f6b2e;--okbg:#e5f4e7;--warn:#a85300;--warnbg:#fff0dc;--bad:#a32020;--badbg:#fde8e8;--gray:#5f5e5a;--graybg:#efedea}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--cream);font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;color:var(--wine);font-weight:600;margin:0 0 .5rem}
+h1{font-size:1.6rem}h2{font-size:1.35rem}h3{font-size:1.1rem}
+.proto{background:var(--wine);color:#fff;text-align:center;font-size:.85rem;padding:.4rem .75rem}
+header{background:#fff;border-bottom:1px solid var(--line);padding:.75rem 1rem}
+.top{max-width:960px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between}
+.brand{font-family:Georgia,serif;font-size:1.5rem;color:var(--wine);font-weight:700}
+.brand small{display:block;font-size:.8rem;color:var(--muted);font-family:inherit;font-weight:400}
+.controls{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--wine);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:#fff;color:var(--wine);padding:.4rem .9rem;font-weight:600;cursor:pointer;font-size:.9rem}
+.seg button.on{background:var(--wine);color:#fff}
+nav{max-width:960px;margin:.6rem auto 0;display:flex;flex-wrap:wrap;gap:.35rem}
+nav button{border:1px solid var(--line);background:var(--blush);color:var(--wine);border-radius:999px;padding:.35rem .8rem;cursor:pointer;font-size:.9rem}
+nav button.on{background:var(--pinksel);color:var(--wine);border-color:#d9a5b3;font-weight:700}
+main{max-width:960px;margin:0 auto;padding:1rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:1rem}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+label{font-weight:600;display:block;margin:.6rem 0 .25rem}
+.opt{font-weight:400;display:flex;gap:.5rem;align-items:center;margin:.25rem 0;cursor:pointer}
+select,input[type=text],input[type=number],input[type=date],textarea{width:100%;padding:.55rem;border:1px solid #cdb8be;border-radius:8px;font:inherit;background:#fff}
+textarea{min-height:70px}
+.btn{background:var(--wine);color:#fff;border:0;border-radius:8px;padding:.55rem 1rem;font-weight:600;cursor:pointer;font-size:.95rem;margin:.25rem .25rem .25rem 0}
+.btn:hover{background:var(--wine2)}
+.btn.sec{background:#fff;color:var(--wine);border:1px solid var(--wine)}
+.btn.danger{background:var(--bad)}
+.btn.small{padding:.35rem .7rem;font-size:.85rem}
+.alert{border-radius:8px;padding:.7rem .9rem;margin:.5rem 0 1rem;font-weight:500}
+.alert.error{background:var(--badbg);color:var(--bad);border:1px solid #f3b9b9}
+.alert.ok{background:var(--okbg);color:var(--ok);border:1px solid #b8dfbf}
+.alert.warn{background:var(--warnbg);color:var(--warn);border:1px solid #f5cf9c}
+.badge{display:inline-block;border-radius:999px;padding:.1rem .65rem;font-size:.8rem;font-weight:700;border:1px solid}
+.st-Approved{background:var(--okbg);color:var(--ok);border-color:#9fd3a8}
+.st-Pending{background:var(--warnbg);color:var(--warn);border-color:#f2b766}
+.st-Declined{background:var(--badbg);color:var(--bad);border-color:#ef9f9f}
+.st-Cancelled,.st-Completed{background:var(--graybg);color:var(--gray);border-color:#cfccc6}
+.muted{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between}
+.price{font-weight:700;color:var(--wine)}
+.slots{display:flex;flex-wrap:wrap;gap:.4rem;margin:.3rem 0 .8rem}
+.slot{border:1px solid #cdb8be;border-radius:8px;padding:.35rem .6rem;cursor:pointer;background:#fff;font-size:.9rem}
+.slot input{margin-right:.3rem}
+.slot.taken{background:#f1eeee;color:#8a7d80;text-decoration:line-through}
+.slot.sel{border-color:var(--wine);background:var(--blush)}
+.thread{border-top:1px dashed var(--line);margin-top:.6rem;padding-top:.6rem}
+.msg{padding:.4rem .6rem;border-radius:8px;margin:.3rem 0;max-width:85%}
+.msg.Client{background:var(--blush)}
+.msg.tech{background:#eef3f8;margin-left:auto}
+.tiles{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1rem}
+.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:.9rem}
+.tile b{display:block;font-size:1.7rem;color:var(--wine);font-family:Georgia,serif}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:.45rem .55rem;text-align:left;vertical-align:top}
+th{background:var(--blush);color:var(--wine)}
+td:first-child{white-space:nowrap}
+.req{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);margin-top:1.5rem;padding-top:.6rem}
+.dia{background:#fff;border:1px solid var(--line);border-radius:12px;padding:.5rem;margin:.5rem 0 1.25rem;overflow-x:auto}
+.dia svg{min-width:640px;height:auto;display:block}
+.small{font-size:.88rem}
+@media (max-width:600px){.brand{font-size:1.25rem}main{padding:.75rem}}
+</style>
+</head>
+<body>
+<div class="proto">PROTOTYPE · class project · synthetic data only · no real payments are processed</div>
+<header>
+  <div class="top">
+    <div class="brand">Set Match<small>Nail service matcher &amp; booking requests</small></div>
+    <div class="controls">
+      <span class="small muted">Viewing as:</span>
+      <div class="seg" id="roleSeg"></div>
+      <select id="clientSel" aria-label="Demo client" style="width:auto"></select>
+      <button class="btn sec small" data-act="reset">Reset demo data</button>
+    </div>
+  </div>
+  <nav id="nav"></nav>
+</header>
+<main id="app"></main>
+<script>
+"use strict";
+/* ---------- constants ---------- */
+const HOUR=3600e3, DAY=24*HOUR;
+const SERVICES=[
+ {id:"gel",name:"Regular Gel Manicure",price:20,from:false,type:"Gel manicure",natural:true,desc:"Gel color on your natural nails. Glossy, chip-resistant, lasts about 2 weeks."},
+ {id:"builder",name:"Builder Gel Manicure",price:26,from:false,type:"Gel manicure",natural:true,desc:"A strengthening builder gel overlay on natural nails to help them grow without breaking."},
+ {id:"gelx",name:"Gel-X Set",price:30,from:true,type:"Gel-X",natural:false,desc:"Soft gel extensions for added length and shape, finished in one color."},
+ {id:"gelxd",name:"Gel-X Set w/ Design",price:30,from:true,type:"Gel-X",natural:false,desc:"Gel-X extensions with nail art. Designs vary, so contact the nail tech for an exact price."},
+ {id:"fill",name:"Gel-X Fill",price:15,from:true,type:"Gel-X",natural:false,desc:"Refresh and rebalance an existing Gel-X set as it grows out."}
+];
+const CLIENTS=["Jordan R.","Maya T.","Ava L."];
+const KEY="setmatch_prototype_v1";
+const svc=id=>SERVICES.find(s=>s.id===id);
+/* BR-7: removal price depends on the booked service */
+function removalPrice(serviceId){
+  if(serviceId==="gelx"||serviceId==="gelxd") return 15;
+  if(serviceId==="gel"||serviceId==="builder") return 10;
+  return null; // not offered with a fill
+}
+function estTotal(a){const s=svc(a.serviceId);return s.price+(a.removal?removalPrice(a.serviceId):0);}
+function money(n,from){return (from?"from ":"")+"$"+n.toFixed(0);}
+function fmtTotal(a){return money(estTotal(a),svc(a.serviceId).from);}
+function fmt(ts){return new Date(ts).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});}
+function fmtDay(ts){return new Date(ts).toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ---------- storage (D1–D5 live in browser storage) ---------- */
+let memoryOnly=false;
+function seed(){
+  const now=Date.now(), base=new Date(); base.setHours(0,0,0,0); const b=base.getTime();
+  const at=(d,h)=>b+d*DAY+h*HOUR;
+  const soon=Math.ceil((now+18*HOUR)/HOUR)*HOUR;      // open slot less than 24 hrs away (shows BR-1)
+  const ava=Math.ceil((now+20*HOUR)/HOUR)*HOUR;       // Ava's approved appt less than 24 hrs away (shows BR-5 warning)
+  let n=1; const slots=[];
+  const add=t=>{const id="s"+(n++);slots.push({id,at:t});return id;};
+  const sSoon=add(soon), sAva=add(ava);
+  const ids={};
+  for(let d=2;d<=21;d++){ if(d%7===0) continue; for(const h of [10,13,16]) ids[d+"-"+h]=add(at(d,h)); }
+  add(at(33,13)); // opened before the 30-day window (shows BR-3)
+  const ap=(o)=>Object.assign({removal:false,requests:[],note:"",depositRequired:false,depositReceived:false,messages:[],createdAt:now-2*DAY},o);
+  const appts=[
+    ap({id:"a1",client:"Jordan R.",serviceId:"gelx",slotId:ids["3-13"],at:at(3,13),status:"Approved",removal:true,
+        requests:[{text:"Can we put on a comedy show?",at:now-DAY}],
+        messages:[{from:"Client",text:"Hi! Is almond shape okay for this set?",at:now-DAY-3*HOUR},{from:"Nail Tech",text:"Yes, almond works great. See you then!",at:now-DAY}]}),
+    ap({id:"a2",client:"Jordan R.",serviceId:"builder",slotId:ids["5-10"],at:at(5,10),status:"Pending"}),
+    ap({id:"a3",client:"Jordan R.",serviceId:"gel",slotId:null,at:at(-10,13),status:"Approved"}),
+    ap({id:"a4",client:"Maya T.",serviceId:"gelxd",slotId:ids["6-16"],at:at(6,16),status:"Pending",depositRequired:true,note:"Thinking chrome French tips"}),
+    ap({id:"a5",client:"Maya T.",serviceId:"fill",slotId:null,at:at(-2,10),status:"Cancelled",lateCancel:true}),
+    ap({id:"a6",client:"Maya T.",serviceId:"gel",slotId:ids["4-10"],at:at(4,10),status:"Declined"}),
+    ap({id:"a7",client:"Ava L.",serviceId:"gel",slotId:sAva,at:ava,status:"Approved"}),
+    ap({id:"a8",client:"Ava L.",serviceId:"gelx",slotId:ids["8-13"],at:at(8,13),status:"Pending"}),
+    ap({id:"a9",client:"Ava L.",serviceId:"fill",slotId:ids["9-10"],at:at(9,10),status:"Pending"})
+  ];
+  return {slots,appts,clients:{"Jordan R.":{depositFlag:false},"Maya T.":{depositFlag:true},"Ava L.":{depositFlag:false}},next:100};
+}
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){memoryOnly=true;}return seed();}
+let db=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){memoryOnly=true;}}
+save();
+const newId=p=>p+(db.next++);
+
+/* ---------- derived ---------- */
+const ACTIVE=["Pending","Approved"];
+function slotTaken(slotId){return db.appts.some(a=>a.slotId===slotId&&ACTIVE.includes(a.status));}
+function displayStatus(a){return (a.status==="Approved"&&a.at<Date.now())?"Completed":a.status;}
+function pendingCount(c){return db.appts.filter(a=>a.client===c&&a.status==="Pending").length;}
+function isUpcoming(a){return a.at>=Date.now()&&ACTIVE.includes(a.status);}
+
+/* ---------- UI state ---------- */
+const ui={role:"Client",client:"Jordan R.",view:"home",flash:null,match:{},matchResult:null,prefill:null,
+  svcType:"All",min:"",max:"",apptTab:"upcoming",reqFilter:"Pending",open:{},confirmCancel:null,book:{serviceId:"",slotId:"",removal:false,note:""}};
+const VIEWS={
+  Client:[["home","Home"],["match","Find My Service"],["services","Services"],["book","Book"],["mine","My Appointments"],["how","How this system works"]],
+  "Nail Tech":[["home","Home"],["requests","Requests"],["avail","Availability"],["dash","Dashboard"],["how","How this system works"]]
+};
+function flash(type,msg){ui.flash={view:ui.view,type,msg};}
+function go(v){ui.view=v;ui.flash=null;render();window.scrollTo(0,0);}
+
+/* ---------- header ---------- */
+function renderHeader(){
+  document.getElementById("roleSeg").innerHTML=["Client","Nail Tech"].map(r=>`<button class="${ui.role===r?"on":""}" data-act="role" data-v="${r}">${r}</button>`).join("");
+  const cs=document.getElementById("clientSel");
+  cs.style.display=ui.role==="Client"?"":"none";
+  cs.innerHTML=CLIENTS.map(c=>`<option ${c===ui.client?"selected":""}>${c}</option>`).join("");
+  document.getElementById("nav").innerHTML=VIEWS[ui.role].map(([v,l])=>`<button class="${ui.view===v?"on":""}" data-act="go" data-v="${v}">${l}</button>`).join("");
+}
+function alertBox(){const f=ui.flash;return f&&f.view===ui.view?`<div class="alert ${f.type}" role="alert">${f.msg}</div>`:"";}
+function reqNote(t){return `<div class="req">Requirements: ${t}</div>`;}
+function badge(a){const s=displayStatus(a);return `<span class="badge st-${s}">${s}</span>`;}
+
+/* ---------- views ---------- */
+function vHome(){
+  if(ui.role==="Client") return `<h1>Hi, ${esc(ui.client)}</h1><p class="muted">As a client you can:</p>
+  <div class="grid">
+   ${homeCard("match","Find My Service","Answer up to 4 quick questions and get matched to the right service and price.")}
+   ${homeCard("services","Browse services","See every service with full descriptions and prices. Filter by type or price.")}
+   ${homeCard("book","Request an appointment","Pick an open time from the nail tech's calendar and send a request.")}
+   ${homeCard("mine","My Appointments","Track upcoming and past appointments, add a removal or special requests, cancel, and message your nail tech.")}
+  </div>
+  <div class="card small"><b>Status colors:</b> <span class="badge st-Approved">Approved</span> <span class="badge st-Pending">Pending</span> <span class="badge st-Declined">Declined</span></div>
+  ${memoryOnly?'<div class="alert warn">Browser storage is unavailable here, so changes last only until the page is closed.</div>':""}
+  ${reqNote("FR-6 · NFR-1, NFR-3")}`;
+  return `<h1>Nail Tech home</h1><p class="muted">As the nail tech you can:</p>
+  <div class="grid">
+   ${homeCard("requests","Review requests","Approve or decline pending requests and mark deposits as received.")}
+   ${homeCard("avail","Set availability","Open time slots on your calendar for the next 30 days.")}
+   ${homeCard("dash","Dashboard","See pending requests, this week's confirmed appointments and expected earnings.")}
+  </div>
+  <div class="card"><b>${db.appts.filter(a=>a.status==="Pending").length}</b> pending request(s) waiting for you.</div>
+  ${reqNote("FR-8, FR-9 · NFR-3")}`;
+}
+function homeCard(v,t,d){return `<div class="card"><h3>${t}</h3><p class="small muted">${d}</p><button class="btn small" data-act="go" data-v="${v}">Open</button></div>`;}
+
+function vMatch(){
+  const m=ui.match, q=(name,val,label)=>`<label class="opt"><input type="radio" name="${name}" value="${val}" ${m[name]===val?"checked":""} data-act="mq"> ${label}</label>`;
+  let h=`<h1>Find My Service</h1><p class="muted">Answer a few questions and Set Match recommends one service.</p>${alertBox()}<div class="card">
+  <label>1. Do you have a Gel-X set on right now that you want to keep and refresh?</label>${q("q1","yes","Yes")}${q("q1","no","No")}`;
+  if(m.q1==="no"){
+    h+=`<label>2. What's your main goal?</label>${q("q2","length","Add length and shape")}${q("q2","strength","Strengthen and grow my natural nails")}${q("q2","color","Just color on my natural nails")}`;
+    if(m.q2==="length") h+=`<label>3. Do you want a design, or plain / one color?</label>${q("q3","design","Design")}${q("q3","plain","Plain / one color")}`;
+    h+=`<label>4. Do you have a Gel-X or builder gel set on that needs to come off?</label>${q("q4","yes","Yes")}${q("q4","no","No")}`;
+  }
+  h+=`<div style="margin-top:.8rem"><button class="btn" data-act="matchGo">Get my match</button><button class="btn sec" data-act="matchReset">Start over</button></div></div>`;
+  const r=ui.matchResult;
+  if(r){const s=svc(r.serviceId),rp=r.removal?removalPrice(r.serviceId):0;
+    h+=`<div class="card" style="border-color:var(--wine)"><h2>Your match: ${s.name}</h2><p>${s.desc}</p>
+    <p>Service: <span class="price">${money(s.price,s.from)}</span>${r.removal?`<br>Suggested add-on: <b>Removal</b> <span class="price">$${rp}</span> <span class="small muted">(BR-7)</span>`:""}
+    <br>Estimated total: <span class="price">${money(s.price+rp,s.from)}</span></p>
+    ${s.id==="gelxd"?'<p class="small muted">Designs vary, so the nail tech confirms the exact price.</p>':""}
+    <button class="btn" data-act="matchBook">Request this service</button></div>`;}
+  return h+reqNote("FR-1 · BR-7 · NFR-2, NFR-5");
+}
+function runMatch(){
+  const m=ui.match;
+  if(!m.q1) return err("Please answer question 1 before getting your match.");
+  let id;
+  if(m.q1==="yes") id="fill";
+  else{
+    if(!m.q2) return err("Please answer question 2 before getting your match.");
+    if(m.q2==="length"){ if(!m.q3) return err("Please answer question 3 before getting your match."); id=m.q3==="design"?"gelxd":"gelx"; }
+    else id=m.q2==="strength"?"builder":"gel";
+    if(!m.q4) return err("Please answer question 4 before getting your match.");
+  }
+  ui.matchResult={serviceId:id,removal:m.q1==="no"&&m.q4==="yes"};ui.flash=null;render();
+  function err(t){ui.matchResult=null;flash("error",t);render();}
+}
+
+function vServices(){
+  let list=SERVICES.filter(s=>ui.svcType==="All"||s.type===ui.svcType);
+  const mn=ui.min===""?null:Number(ui.min), mx=ui.max===""?null:Number(ui.max);
+  let error="";
+  if((mn!==null&&(isNaN(mn)||mn<0))||(mx!==null&&(isNaN(mx)||mx<0))) error="Prices must be 0 or more.";
+  else if(mn!==null&&mx!==null&&mn>mx) error="The minimum price can't be higher than the maximum price.";
+  if(!error) list=list.filter(s=>(mn===null||s.price>=mn)&&(mx===null||s.price<=mx));
+  return `<h1>Services</h1>${alertBox()}<div class="card"><div class="grid">
+   <div><label for="ft">Service type</label><select id="ft" data-act="svcType">${["All","Gel manicure","Gel-X"].map(t=>`<option ${t===ui.svcType?"selected":""}>${t}</option>`).join("")}</select></div>
+   <div><label for="fmin">Min price ($)</label><input id="fmin" type="number" min="0" value="${esc(ui.min)}" data-act="svcMin"></div>
+   <div><label for="fmax">Max price ($)</label><input id="fmax" type="number" min="0" value="${esc(ui.max)}" data-act="svcMax"></div></div>
+   ${error?`<div class="alert error">${error}</div>`:`<p class="small muted">${list.length} service(s) shown.</p>`}</div>
+   ${error?"":list.map(s=>`<div class="card"><div class="row"><h3>${s.name}</h3><span class="price">${money(s.price,s.from)}</span></div>
+     <p>${s.desc}</p><p class="small muted">${s.type} · Removal add-on: ${removalPrice(s.id)?"$"+removalPrice(s.id):"not offered with a fill"}</p>
+     <button class="btn small" data-act="bookSvc" data-v="${s.id}">Request this service</button></div>`).join("")||'<div class="card">No services match these filters.</div>'}
+   ${reqNote("FR-2 · BR-7")}`;
+}
+
+function vBook(){
+  const b=ui.book, now=Date.now();
+  const slots=db.slots.filter(s=>s.at>now).sort((x,y)=>x.at-y.at);
+  const byDay={};slots.forEach(s=>{const k=new Date(s.at).toDateString();(byDay[k]=byDay[k]||[]).push(s);});
+  const rp=b.serviceId?removalPrice(b.serviceId):null;
+  return `<h1>Request an appointment</h1><p class="muted">Requests are sent to the nail tech as <span class="badge st-Pending">Pending</span> until she approves them.</p>${alertBox()}
+  <div class="card">
+   <label for="bs">Service</label><select id="bs" data-act="bSvc"><option value="">Choose a service…</option>${SERVICES.map(s=>`<option value="${s.id}" ${b.serviceId===s.id?"selected":""}>${s.name} (${money(s.price,s.from)})</option>`).join("")}</select>
+   <label class="opt" style="margin-top:.6rem"><input type="checkbox" data-act="bRem" ${b.removal?"checked":""} ${b.serviceId&&rp===null?"disabled":""}> Add removal ${b.serviceId?(rp===null?"(not offered with a fill)":"($"+rp+", BR-7)"):"($15 before Gel-X, $10 before a natural-nail service)"}</label>
+   <label>Open times on the nail tech's calendar</label>
+   <p class="small muted">Times crossed out are already booked.</p>
+   ${Object.keys(byDay).map(k=>`<div><b class="small">${fmtDay(byDay[k][0].at)}</b><div class="slots">${byDay[k].map(s=>{const t=slotTaken(s.id);return `<label class="slot ${t?"taken":""} ${b.slotId===s.id?"sel":""}"><input type="radio" name="slot" value="${s.id}" ${b.slotId===s.id?"checked":""} data-act="bSlot">${new Date(s.at).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</label>`;}).join("")}</div></div>`).join("")||'<p class="muted">No open times right now.</p>'}
+   <label for="bn">Note for the nail tech (optional)</label><textarea id="bn" maxlength="300" data-act="bNote" placeholder="Inspo, shape, questions…">${esc(b.note)}</textarea>
+   ${b.serviceId?`<p>Estimated total: <span class="price">${money(svc(b.serviceId).price+(b.removal&&rp?rp:0),svc(b.serviceId).from)}</span></p>`:""}
+   <button class="btn" data-act="submitReq">Send request</button>
+  </div>${reqNote("FR-3 · BR-1, BR-2, BR-3, BR-4, BR-5, BR-7")}`;
+}
+function submitRequest(){
+  const b=ui.book, c=ui.client, now=Date.now();
+  const fail=t=>{flash("error",t);render();window.scrollTo(0,0);};
+  // 3.1 Validate details
+  if(!b.serviceId) return fail("Please choose a service.");
+  if(!b.slotId) return fail("Please choose a time from the calendar.");
+  if(b.note.length>300) return fail("Your note must be 300 characters or less.");
+  const slot=db.slots.find(s=>s.id===b.slotId);
+  if(!slot) return fail("BR-4: That time is no longer on the nail tech's calendar. Please choose another.");
+  if(slot.at-now<DAY) return fail("BR-1: Requests must be made at least 24 hours before the appointment time. Please choose a later time.");
+  if(slot.at-now>30*DAY) return fail("BR-3: Appointments can be requested no more than 30 days in advance. Please choose an earlier time.");
+  // 3.2 Check slot
+  if(slotTaken(slot.id)) return fail("BR-4: That time is already booked. You can only request times the nail tech has marked as available.");
+  // 3.3 Check client limits
+  if(pendingCount(c)>=2) return fail("BR-2: You already have 2 pending requests. Please wait for the nail tech to respond before sending another.");
+  if(b.removal&&removalPrice(b.serviceId)===null) return fail("BR-7: Removal is only added before a new Gel-X set or a natural-nail service.");
+  const flagged=db.clients[c].depositFlag;
+  // 3.4 Save pending request
+  const a={id:newId("a"),client:c,serviceId:b.serviceId,slotId:slot.id,at:slot.at,status:"Pending",removal:!!b.removal,requests:[],note:b.note.trim(),
+    depositRequired:flagged,depositReceived:false,messages:[],createdAt:now};
+  db.appts.push(a);save();
+  ui.book={serviceId:"",slotId:"",removal:false,note:""};
+  ui.view="mine";ui.apptTab="upcoming";
+  flash(flagged?"warn":"ok",`Request sent for ${svc(a.serviceId).name} on ${fmt(a.at)}. Status: Pending.`+
+    (flagged?` <br>BR-5: Because of a late cancellation, a 20% deposit ($${(estTotal(a)*0.2).toFixed(2)}) is required before the nail tech can approve this request.`:""));
+  render();window.scrollTo(0,0);
+}
+
+function apptCard(a,role){
+  const s=svc(a.serviceId), up=isUpcoming(a), open=ui.open[a.id];
+  let h=`<div class="card" id="card-${a.id}"><div class="row"><h3>${s.name}</h3>${badge(a)}</div>
+   <p class="small">${role==="tech"?`<b>${esc(a.client)}</b> · `:""}${fmt(a.at)}<br>Estimated total: <span class="price">${fmtTotal(a)}</span>${a.removal?` (includes removal $${removalPrice(a.serviceId)})`:""}
+   ${a.depositRequired?`<br>Deposit (20%): <b>$${(estTotal(a)*0.2).toFixed(2)}</b> · ${a.depositReceived?'<span style="color:var(--ok)">received</span>':'<span style="color:var(--bad)">not received yet</span>'}`:""}
+   ${a.lateCancel?'<br><span class="muted">Cancelled less than 24 hrs before the appointment.</span>':""}</p>
+   ${a.note?`<p class="small"><b>Note:</b> ${esc(a.note)}</p>`:""}
+   ${a.requests.length?`<p class="small"><b>Special requests:</b></p><ul class="small">${a.requests.map(r=>`<li>${esc(r.text)}</li>`).join("")}</ul>`:""}`;
+  if(role==="client"&&up){
+    const rp=removalPrice(a.serviceId);
+    h+=`<div class="thread"><b class="small">Add to this appointment</b>
+      ${!a.removal&&rp!==null?`<div><button class="btn small sec" data-act="addRem" data-v="${a.id}">Add removal (+$${rp})</button></div>`:""}
+      <label for="sr-${a.id}" class="small">Special request (free)</label>
+      <input type="text" id="sr-${a.id}" maxlength="200" placeholder="e.g. a show to watch, a silent appointment, a question">
+      <button class="btn small" data-act="addReq" data-v="${a.id}">Add request</button>
+      <div style="margin-top:.5rem">${ui.confirmCancel===a.id?
+        `<div class="alert warn">BR-5: This appointment is less than 24 hours away. If you cancel now, your next appointment will require a 20% deposit before it can be confirmed.<br>
+         <button class="btn small danger" data-act="cancelYes" data-v="${a.id}">Cancel anyway</button><button class="btn small sec" data-act="cancelNo">Keep my appointment</button></div>`
+        :`<button class="btn small danger" data-act="cancel" data-v="${a.id}">Cancel appointment</button>`}</div></div>`;
+  }
+  if(role==="tech"){
+    h+=`<div>${a.depositRequired&&!a.depositReceived?`<button class="btn small sec" data-act="deposit" data-v="${a.id}">Mark deposit received</button>`:""}
+      <button class="btn small" data-act="approve" data-v="${a.id}">Approve</button>
+      <button class="btn small danger" data-act="decline" data-v="${a.id}">Decline</button></div>`;
+  }
+  h+=`<div><button class="btn small sec" data-act="toggleMsg" data-v="${a.id}">${open?"Hide":"Show"} messages (${a.messages.length})</button></div>`;
+  if(open){
+    const me=role==="tech"?"Nail Tech":"Client";
+    h+=`<div class="thread">${a.messages.map(m=>`<div class="msg ${m.from==="Client"?"Client":"tech"}"><div class="small"><b>${m.from==="Client"?esc(a.client):"Nail Tech"}</b> · <span class="muted">${fmt(m.at)}</span></div>${esc(m.text)}</div>`).join("")||'<p class="small muted">No messages yet.</p>'}
+     <label for="m-${a.id}" class="small">Message as ${me}</label><textarea id="m-${a.id}" data-act="msgType" data-v="${a.id}"></textarea>
+     <div class="row"><span class="small muted" id="cc-${a.id}">0 / 500</span><button class="btn small" data-act="send" data-v="${a.id}" data-from="${me}">Send</button></div></div>`;
+  }
+  return h+`</div>`;
+}
+function vMine(){
+  const mine=db.appts.filter(a=>a.client===ui.client);
+  const up=mine.filter(isUpcoming).sort((a,b)=>a.at-b.at), past=mine.filter(a=>!isUpcoming(a)).sort((a,b)=>b.at-a.at);
+  const list=ui.apptTab==="upcoming"?up:past;
+  return `<h1>My Appointments</h1>${alertBox()}
+   <div class="seg" style="margin-bottom:1rem"><button class="${ui.apptTab==="upcoming"?"on":""}" data-act="tab" data-v="upcoming">Upcoming (${up.length})</button><button class="${ui.apptTab==="past"?"on":""}" data-act="tab" data-v="past">Past &amp; closed (${past.length})</button></div>
+   <p class="small muted">Pending requests: ${pendingCount(ui.client)} of 2 allowed (BR-2)${db.clients[ui.client].depositFlag?' · <b style="color:var(--bad)">A 20% deposit is required on your next request (BR-5)</b>':""}</p>
+   ${list.map(a=>apptCard(a,"client")).join("")||'<div class="card muted">Nothing here yet.</div>'}
+   ${reqNote("FR-4, FR-5, FR-6, FR-10 · BR-1, BR-5, BR-7 · NFR-1")}`;
+}
+function cancelAppt(id,confirmed){
+  const a=db.appts.find(x=>x.id===id);
+  if(!a||!isUpcoming(a)){flash("error","Only upcoming Pending or Approved appointments can be cancelled.");return render();}
+  const late=a.at-Date.now()<DAY;
+  if(late&&!confirmed){ui.confirmCancel=id;ui.flash=null;return render();}
+  a.status="Cancelled";
+  if(late){a.lateCancel=true;db.clients[a.client].depositFlag=true;}
+  ui.confirmCancel=null;save();
+  flash(late?"warn":"ok",late?"Appointment cancelled. BR-5: your next request will need a 20% deposit before it can be approved.":"Appointment cancelled.");
+  render();
+}
+function addRemoval(id){
+  const a=db.appts.find(x=>x.id===id);
+  if(a.at-Date.now()<DAY){flash("error","BR-1: Changes must be made at least 24 hours before the appointment.");return render();}
+  const rp=removalPrice(a.serviceId);
+  if(rp===null){flash("error","BR-7: Removal is only added before a new Gel-X set or a natural-nail service.");return render();}
+  a.removal=true;save();flash("ok",`Removal added (+$${rp}). New estimated total: ${fmtTotal(a)}.`);render();
+}
+function addRequest(id){
+  const a=db.appts.find(x=>x.id===id), t=(document.getElementById("sr-"+id).value||"").trim();
+  if(!t){flash("error","Please type your special request first.");return render();}
+  if(t.length>200){flash("error","Special requests must be 200 characters or less.");return render();}
+  if(a.at-Date.now()<DAY){flash("error","BR-1: Changes must be made at least 24 hours before the appointment.");return render();}
+  a.requests.push({text:t,at:Date.now()});save();flash("ok","Special request added. No price change.");render();
+}
+function sendMsg(id,from){
+  const a=db.appts.find(x=>x.id===id), t=(document.getElementById("m-"+id).value||"").trim();
+  if(!t){flash("error","Messages can't be empty.");return render();}
+  if(t.length>500){flash("error","Messages must be 500 characters or less.");return render();}
+  a.messages.push({from,text:t,at:Date.now()});save();ui.flash=null;render();
+}
+
+function vRequests(){
+  let list=db.appts.filter(a=>a.at>=Date.now()-DAY);
+  if(ui.reqFilter!=="All") list=list.filter(a=>a.status===ui.reqFilter);
+  list.sort((a,b)=>a.at-b.at);
+  const flagged=Object.entries(db.clients).filter(([,v])=>v.depositFlag).map(([k])=>k);
+  return `<h1>Requests</h1>${alertBox()}
+  <div class="card"><label for="rf">Show</label><select id="rf" data-act="reqFilter" style="max-width:240px">${["Pending","Approved","Declined","Cancelled","All"].map(x=>`<option ${x===ui.reqFilter?"selected":""}>${x}</option>`).join("")}</select>
+   <p class="small muted">Clients with a deposit flag (BR-5): ${flagged.length?flagged.map(esc).join(", "):"none"}</p></div>
+  ${list.map(a=>apptCard(a,"tech")).join("")||'<div class="card muted">No requests in this view.</div>'}
+  ${reqNote("FR-8, FR-10 · BR-5, BR-6 · NFR-1")}`;
+}
+function decide(id,approve){
+  const a=db.appts.find(x=>x.id===id);
+  if(a.status!=="Pending"){flash("error",`BR-6: Only Pending requests can be approved or declined. This request is ${displayStatus(a)}.`);return render();}
+  if(approve&&a.depositRequired&&!a.depositReceived){flash("error",`BR-5: ${esc(a.client)} has a late-cancel deposit flag. Mark the 20% deposit ($${(estTotal(a)*0.2).toFixed(2)}) as received before approving.`);return render();}
+  a.status=approve?"Approved":"Declined";save();
+  flash("ok",`${approve?"Approved":"Declined"}: ${esc(a.client)} · ${svc(a.serviceId).name} · ${fmt(a.at)}. The client now sees it as ${a.status}.`);render();
+}
+function markDeposit(id){
+  const a=db.appts.find(x=>x.id===id);
+  if(!a.depositRequired||a.depositReceived){flash("error","No deposit is waiting on this request.");return render();}
+  a.depositReceived=true;db.clients[a.client].depositFlag=false;save();
+  flash("ok",`Deposit of $${(estTotal(a)*0.2).toFixed(2)} recorded for ${esc(a.client)} (no real payment processed). You can now approve the request.`);render();
+}
+
+function vAvail(){
+  const now=Date.now(), list=db.slots.filter(s=>s.at>now).sort((a,b)=>a.at-b.at);
+  return `<h1>Availability</h1>${alertBox()}
+  <div class="card"><h3>Open a time slot</h3><div class="grid">
+   <div><label for="ad">Date</label><input type="date" id="ad"></div>
+   <div><label for="at">Time</label><select id="at">${[9,10,11,12,13,14,15,16,17,18].map(h=>`<option value="${h}">${new Date(2000,0,1,h).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</option>`).join("")}</select></div></div>
+   <button class="btn" data-act="addSlot" style="margin-top:.6rem">Open this slot</button></div>
+  <div class="card"><h3>Your calendar (${list.length} future slots)</h3>
+   <table><tr><th>Time</th><th>Status</th><th></th></tr>${list.map(s=>{const t=db.appts.find(a=>a.slotId===s.id&&ACTIVE.includes(a.status));
+     return `<tr><td>${fmt(s.at)}</td><td>${t?`${badge(t)} ${esc(t.client)}`:"Open"}</td><td>${t?"":`<button class="btn small sec" data-act="delSlot" data-v="${s.id}">Remove</button>`}</td></tr>`;}).join("")}</table></div>
+  ${reqNote("FR-7 · BR-3, BR-4")}`;
+}
+function addSlot(){
+  const d=document.getElementById("ad").value, h=Number(document.getElementById("at").value);
+  if(!d){flash("error","Please choose a date.");return render();}
+  const [y,m,dd]=d.split("-").map(Number), t=new Date(y,m-1,dd,h).getTime(), now=Date.now();
+  if(t<=now){flash("error","Time slots must be in the future.");return render();}
+  if(t-now>30*DAY){flash("error","BR-3: Slots can be opened no more than 30 days in advance.");return render();}
+  if(db.slots.some(s=>s.at===t)){flash("error","That time slot is already on your calendar.");return render();}
+  db.slots.push({id:newId("s"),at:t});save();flash("ok",`Opened ${fmt(t)}. Clients can now request it.`);render();
+}
+function delSlot(id){
+  if(slotTaken(id)){flash("error","That slot has an active request and can't be removed.");return render();}
+  db.slots=db.slots.filter(s=>s.id!==id);save();flash("ok","Slot removed.");render();
+}
+
+function vDash(){
+  const now=Date.now(), wk=db.appts.filter(a=>a.status==="Approved"&&a.at>=now&&a.at<now+7*DAY).sort((a,b)=>a.at-b.at);
+  const pend=db.appts.filter(a=>a.status==="Pending"), earn=wk.reduce((s,a)=>s+estTotal(a),0);
+  const dep=db.appts.filter(a=>a.status==="Pending"&&a.depositRequired&&!a.depositReceived);
+  return `<h1>Dashboard</h1>
+  <div class="tiles"><div class="tile"><b>${pend.length}</b>Pending requests</div><div class="tile"><b>${wk.length}</b>Confirmed this week</div>
+   <div class="tile"><b>$${earn}</b>Expected earnings this week (estimated, "from" prices)</div><div class="tile"><b>${dep.length}</b>Deposits waiting</div></div>
+  <div class="card"><h3>Confirmed in the next 7 days</h3>${wk.length?`<table><tr><th>When</th><th>Client</th><th>Service</th><th>Est. total</th></tr>${wk.map(a=>`<tr><td>${fmt(a.at)}</td><td>${esc(a.client)}</td><td>${svc(a.serviceId).name}${a.removal?" + removal":""}</td><td>${fmtTotal(a)}</td></tr>`).join("")}</table>`:'<p class="muted">No confirmed appointments this week.</p>'}</div>
+  <div class="card"><h3>Pending requests</h3>${pend.length?`<table><tr><th>When</th><th>Client</th><th>Service</th><th>Deposit</th></tr>${pend.sort((a,b)=>a.at-b.at).map(a=>`<tr><td>${fmt(a.at)}</td><td>${esc(a.client)}</td><td>${svc(a.serviceId).name}</td><td>${a.depositRequired?(a.depositReceived?"Received":"Required"):"—"}</td></tr>`).join("")}</table>`:'<p class="muted">None.</p>'}
+   <button class="btn small" data-act="go" data-v="requests">Go to requests</button></div>
+  ${reqNote("FR-9")}`;
+}
+
+function vHow(){ return document.getElementById("howTpl").innerHTML; }
+
+function render(){
+  renderHeader();
+  const v={home:vHome,match:vMatch,services:vServices,book:vBook,mine:vMine,requests:vRequests,avail:vAvail,dash:vDash,how:vHow}[ui.view]||vHome;
+  document.getElementById("app").innerHTML=v();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act]"); if(!t) return;
+  const a=t.dataset.act, v=t.dataset.v;
+  if(t.tagName==="INPUT"||t.tagName==="SELECT"||t.tagName==="TEXTAREA") return;
+  switch(a){
+    case "role": ui.role=v; ui.view="home"; ui.flash=null; ui.open={}; ui.confirmCancel=null; render(); break;
+    case "go": go(v); break;
+    case "reset": db=seed(); save(); ui.book={serviceId:"",slotId:"",removal:false,note:""}; ui.match={}; ui.matchResult=null; ui.open={}; ui.confirmCancel=null; flash("ok","Demo data reset."); render(); break;
+    case "matchGo": runMatch(); break;
+    case "matchReset": ui.match={}; ui.matchResult=null; ui.flash=null; render(); break;
+    case "matchBook": ui.book={serviceId:ui.matchResult.serviceId,slotId:"",removal:ui.matchResult.removal,note:""}; go("book"); break;
+    case "bookSvc": ui.book={serviceId:v,slotId:"",removal:false,note:""}; go("book"); break;
+    case "submitReq": submitRequest(); break;
+    case "tab": ui.apptTab=v; ui.flash=null; render(); break;
+    case "addRem": addRemoval(v); break;
+    case "addReq": addRequest(v); break;
+    case "cancel": cancelAppt(v,false); break;
+    case "cancelYes": cancelAppt(v,true); break;
+    case "cancelNo": ui.confirmCancel=null; render(); break;
+    case "toggleMsg": ui.open[v]=!ui.open[v]; render(); break;
+    case "send": sendMsg(v,t.dataset.from); break;
+    case "approve": decide(v,true); break;
+    case "decline": decide(v,false); break;
+    case "deposit": markDeposit(v); break;
+    case "addSlot": addSlot(); break;
+    case "delSlot": delSlot(v); break;
+  }
+});
+document.addEventListener("change",e=>{
+  const t=e.target, a=t.dataset&&t.dataset.act;
+  if(t.id==="clientSel"){ui.client=t.value;ui.flash=null;ui.open={};ui.confirmCancel=null;ui.book.slotId="";render();return;}
+  if(!a) return;
+  switch(a){
+    case "mq": ui.match[t.name]=t.value; if(t.name==="q1"){delete ui.match.q2;delete ui.match.q3;delete ui.match.q4;} if(t.name==="q2") delete ui.match.q3; ui.matchResult=null; render(); break;
+    case "svcType": ui.svcType=t.value; render(); break;
+    case "reqFilter": ui.reqFilter=t.value; ui.flash=null; render(); break;
+    case "bSvc": ui.book.serviceId=t.value; if(removalPrice(t.value)===null) ui.book.removal=false; render(); break;
+    case "bRem": ui.book.removal=t.checked; render(); break;
+    case "bSlot": ui.book.slotId=t.value; render(); break;
+  }
+});
+document.addEventListener("input",e=>{
+  const t=e.target, a=t.dataset&&t.dataset.act;
+  if(a==="bNote") ui.book.note=t.value;
+  if(a==="svcMin"||a==="svcMax"){ if(a==="svcMin") ui.min=t.value; else ui.max=t.value; const pos=t.selectionStart, id=t.id; render(); const el=document.getElementById(id); el.focus(); }
+  if(a==="msgType"){const c=document.getElementById("cc-"+t.dataset.v); if(c){c.textContent=t.value.length+" / 500"; c.style.color=t.value.length>500?"var(--bad)":"";}}
+});
+render();
+</script>
+
+<template id="howTpl">
+<h1>How this system works</h1>
+<p class="muted">This page explains what happens inside Set Match: who it is for, the rules it follows, and how data and the booking process move through it.</p>
+<div class="card"><h2>Target user and value model</h2>
+<table>
+<tr><th style="width:28%">Primary user</th><td>Clients of private nail techs who book through DMs and need one place to find, request, and track their appointments.</td></tr>
+<tr><th>Secondary stakeholder</th><td>The private nail tech who approves appointment requests, manages the service menu, and replies to clients.</td></tr>
+<tr><th>Problem or need</th><td>Booking through DMs is messy. Requests get lost, clients don't know which service or price fits them, and neither side has one place to track appointments.</td></tr>
+<tr><th>Value model</th><td><b>Free service.</b> Who benefits: clients get matched to the right service and book without back-and-forth; the nail tech gets organized requests and fewer wrong bookings. Who bears the cost: the nail tech, who hosts it. What keeps it going: the nail tech's paid services.</td></tr>
+<tr><th>User roles</th><td>Client and Nail Tech, switched with the role selector at the top (no login).</td></tr>
+</table></div>
+
+<div class="card"><h2>Requirements</h2>
+<h3>Functional</h3>
+<table><tr><th>ID</th><th>Requirement</th><th>Rules</th></tr>
+<tr><td>FR-1</td><td>Find My Service: ask up to 4 questions, recommend one of the 5 services with its price, suggest the removal add-on when needed, and let the client request it directly.</td><td>BR-7</td></tr>
+<tr><td>FR-2</td><td>Show every service with description and price; filter by service type and price range.</td><td>—</td></tr>
+<tr><td>FR-3</td><td>Request an appointment: choose a service and an open slot from the availability calendar, add an optional note, save as Pending.</td><td>BR-1, BR-2, BR-3, BR-4</td></tr>
+<tr><td>FR-4</td><td>Add a removal add-on (priced by BR-7, total recalculated) or free special requests to an upcoming appointment.</td><td>BR-1, BR-7</td></tr>
+<tr><td>FR-5</td><td>Cancel an appointment; under 24 hours, warn first and flag the client's next request for a 20% deposit.</td><td>BR-5</td></tr>
+<tr><td>FR-6</td><td>My Appointments: upcoming and past appointments with their current status.</td><td>—</td></tr>
+<tr><td>FR-7</td><td>Nail tech opens time slots for future dates within the next 30 days.</td><td>BR-3</td></tr>
+<tr><td>FR-8</td><td>Nail tech approves or declines Pending requests; approval is blocked for a flagged client until the deposit is marked received.</td><td>BR-5, BR-6</td></tr>
+<tr><td>FR-9</td><td>Dashboard: pending requests, this week's confirmed appointments, expected earnings.</td><td>—</td></tr>
+<tr><td>FR-10</td><td>Client and nail tech message each other on an appointment, saved with a timestamp; not empty, 500 characters max.</td><td>—</td></tr></table>
+<h3>Non-functional</h3>
+<table><tr><th>ID</th><th>Category</th><th>Requirement</th></tr>
+<tr><td>NFR-1</td><td>Usability</td><td>Status shown with color and text: green Approved, orange Pending, red Declined.</td></tr>
+<tr><td>NFR-2</td><td>Usability</td><td>A first-time client can complete the matcher and submit a request in under 2 minutes without instructions.</td></tr>
+<tr><td>NFR-3</td><td>Usability</td><td>Readable and usable on a phone screen.</td></tr>
+<tr><td>NFR-4</td><td>Reliability</td><td>Appointments, requests, availability, and messages stay saved after the page is refreshed or closed.</td></tr>
+<tr><td>NFR-5</td><td>Performance</td><td>The matcher's recommendation appears within 1 second of the last answer.</td></tr></table>
+<h3>Business rules</h3>
+<table><tr><th>ID</th><th>Rule</th><th>Checked by</th></tr>
+<tr><td>BR-1</td><td>All requests (new appointments, add-ons, special requests) must be made at least 24 hours before the appointment.</td><td>FR-3, FR-4</td></tr>
+<tr><td>BR-2</td><td>A client may have no more than 2 pending requests at a time.</td><td>FR-3</td></tr>
+<tr><td>BR-3</td><td>Appointments can be requested no more than 30 days in advance.</td><td>FR-3, FR-7</td></tr>
+<tr><td>BR-4</td><td>Clients can only request slots the nail tech marked as available.</td><td>FR-3</td></tr>
+<tr><td>BR-5</td><td>Cancelling less than 24 hours before shows a warning; the client's next request can't be approved until a 20% deposit is marked received.</td><td>FR-5, FR-8</td></tr>
+<tr><td>BR-6</td><td>The nail tech can only approve or decline Pending requests.</td><td>FR-8</td></tr>
+<tr><td>BR-7</td><td>Removal costs $15 before a Gel-X set and $10 before a natural-nail service (Regular Gel or Builder Gel).</td><td>FR-1, FR-4</td></tr></table>
+<h3>Constraints</h3>
+<table><tr><th>ID</th><th>Constraint</th></tr>
+<tr><td>C-1</td><td>Runs in a web browser with all data in browser storage (localStorage). No login, database server, or paid service.</td></tr>
+<tr><td>C-2</td><td>Synthetic data only. No real client names, phone numbers, or payment information.</td></tr>
+<tr><td>C-3</td><td>No real payments. Prices, estimated totals, and the 20% deposit are only displayed and recorded.</td></tr>
+<tr><td>C-4</td><td>Opens from a public link with no sign-in and stays live until grades are posted.</td></tr></table>
+</div>
+
+<div class="card"><h2>Data stores</h2>
+<table><tr><th>Store</th><th>What it holds</th></tr>
+<tr><td>D1 Services</td><td>Service names, descriptions, prices</td></tr>
+<tr><td>D2 Availability</td><td>Open time slots set by the nail tech</td></tr>
+<tr><td>D3 Appointments</td><td>Every request and appointment with status, add-ons, special requests, and estimated total</td></tr>
+<tr><td>D4 Clients</td><td>Each client's late-cancel deposit flag (pending count is counted from D3)</td></tr>
+<tr><td>D5 Messages</td><td>Message threads for each appointment</td></tr></table></div>
+
+<div class="card"><h2>Business process model: booking an appointment</h2>
+<p class="small muted">One full booking from the client choosing a slot to seeing the final status. Decision: the nail tech approves or declines. Exception path: a request that breaks a rule shows an error with the rule ID and the client picks another slot.</p>
+<div class="dia"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 640" width="100%" style="font-family:Georgia,'Times New Roman',serif;background:#fff" role="img"><title>BPM – Booking an appointment</title><defs><marker id="ah_bpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2b1d22"/></marker></defs><rect width="1560" height="640" fill="#fff"/><rect x="20" y="20" width="1520" height="180" fill="#fff" stroke="#2b1d22" stroke-width="1.2"/><rect x="20" y="20" width="110" height="180" fill="#f6e9ec" stroke="#2b1d22" stroke-width="1.2"/><rect x="20" y="200" width="1520" height="180" fill="#fff" stroke="#2b1d22" stroke-width="1.2"/><rect x="20" y="200" width="110" height="180" fill="#f6e9ec" stroke="#2b1d22" stroke-width="1.2"/><rect x="20" y="380" width="1520" height="180" fill="#fff" stroke="#2b1d22" stroke-width="1.2"/><rect x="20" y="380" width="110" height="180" fill="#f6e9ec" stroke="#2b1d22" stroke-width="1.2"/><circle cx="175" cy="110" r="16" fill="#fff" stroke="#2b1d22" stroke-width="1.5"/><rect x="220" y="80" width="150" height="60" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><rect x="410" y="80" width="140" height="60" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><rect x="410" y="260" width="140" height="60" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><path d="M640 250 L680 290 L640 330 L600 290 Z" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.4"/><rect x="220" y="260" width="150" height="60" rx="12" fill="#fdeaea" stroke="#2b1d22" stroke-width="1.4"/><rect x="730" y="260" width="160" height="60" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><rect x="730" y="440" width="160" height="60" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><path d="M980 430 L1020 470 L980 510 L940 470 Z" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.4"/><rect x="1070" y="215" width="170" height="52" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><rect x="1070" y="305" width="170" height="52" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><rect x="1300" y="80" width="150" height="60" rx="12" fill="#fff" stroke="#2b1d22" stroke-width="1.4"/><circle cx="1495" cy="110" r="16" fill="#fff" stroke="#2b1d22" stroke-width="4"/><path d="M191.0 110.0 L220.0 110.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M370.0 110.0 L410.0 110.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M480.0 140.0 L480.0 260.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M550.0 290.0 L600.0 290.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M680.0 290.0 L730.0 290.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M640.0 330.0 L640.0 362.0 L295.0 362.0 L295.0 320.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)" stroke-dasharray="6 4"/><path d="M295.0 260.0 L295.0 140.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)" stroke-dasharray="6 4"/><path d="M810.0 320.0 L810.0 440.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M890.0 470.0 L940.0 470.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M980.0 430.0 L980.0 241.0 L1070.0 241.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M1020.0 470.0 L1110.0 470.0 L1110.0 357.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M1240.0 241.0 L1350.0 241.0 L1350.0 140.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M1240.0 331.0 L1400.0 331.0 L1400.0 140.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><path d="M1450.0 110.0 L1479.0 110.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_bpm)"/><text x="75.0" y="110.0" font-size="15" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Client</text><text x="75.0" y="281.0" font-size="15" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Set Match</text><text x="75.0" y="299.0" font-size="15" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">system</text><text x="75.0" y="470.0" font-size="15" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Nail Tech</text><text x="175.0" y="140.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Start</text><text x="295.0" y="102.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Choose service</text><text x="295.0" y="118.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">and open slot</text><text x="480.0" y="110.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Submit request</text><text x="480.0" y="282.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Check booking</text><text x="480.0" y="298.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">rules</text><text x="640.0" y="238.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Rules passed?</text><text x="295.0" y="282.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Show error with</text><text x="295.0" y="298.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">rule ID</text><text x="810.0" y="282.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Save request as</text><text x="810.0" y="298.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Pending (orange)</text><text x="810.0" y="462.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Review pending</text><text x="810.0" y="478.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">request</text><text x="980.0" y="418.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Approve?</text><text x="1155.0" y="233.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Set status</text><text x="1155.0" y="249.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Approved (green)</text><text x="1155.0" y="323.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Set status</text><text x="1155.0" y="339.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Declined (red)</text><text x="1375.0" y="102.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">View updated</text><text x="1375.0" y="118.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">status</text><text x="1495.0" y="140.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">End</text><text x="705.0" y="280.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Yes</text><text x="470.0" y="352.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#a32d2d">No (exception path)</text><text x="303.0" y="170.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#a32d2d">Pick another slot</text><text x="988.0" y="405.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Approve</text><text x="1060.0" y="483.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Decline</text><text x="780.0" y="600.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#6b5560">Decision: the nail tech approves or declines (BR-6).  Exception: a request that breaks BR-1, BR-2, BR-3 or BR-4 shows an error with the rule ID and the client picks another slot.</text></svg></div>
+<h2>Context diagram</h2><div class="dia"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 880" width="100%" style="font-family:Georgia,'Times New Roman',serif;background:#fff" role="img"><title>Context diagram – Set Match system</title><defs><marker id="ah_context" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2b1d22"/></marker></defs><rect width="780" height="880" fill="#fff"/><rect x="270" y="40" width="240" height="80" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><circle cx="390" cy="440" r="125" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><rect x="270" y="760" width="240" height="80" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><path d="M410.0 120.0 L410.0 318.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_context)"/><path d="M370.0 318.0 L370.0 120.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_context)"/><path d="M370.0 562.0 L370.0 760.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_context)"/><path d="M410.0 760.0 L410.0 562.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_context)"/><text x="390.0" y="80.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Client</text><text x="390.0" y="422.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">0</text><text x="390.0" y="440.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Set Match</text><text x="390.0" y="456.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">system</text><text x="390.0" y="800.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Nail Tech</text><text x="424.0" y="150.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Matcher answers</text><text x="424.0" y="169.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointment request</text><text x="424.0" y="188.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Add-ons, special requests</text><text x="424.0" y="207.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Cancellation</text><text x="424.0" y="226.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message</text><text x="356.0" y="140.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Recommendation + price</text><text x="356.0" y="159.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Service menu</text><text x="356.0" y="178.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Open time slots</text><text x="356.0" y="197.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Request status / rule error</text><text x="356.0" y="216.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Updated status</text><text x="356.0" y="235.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Estimated total, late-cancel warning</text><text x="356.0" y="254.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">My Appointments</text><text x="356.0" y="273.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message thread</text><text x="356.0" y="610.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Pending requests</text><text x="356.0" y="629.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Deposit flags</text><text x="356.0" y="648.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Rule error</text><text x="356.0" y="667.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Dashboard summary</text><text x="356.0" y="686.0" font-size="13" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message thread</text><text x="424.0" y="620.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Open time slots</text><text x="424.0" y="639.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Approve / decline decision</text><text x="424.0" y="658.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Deposit received</text><text x="424.0" y="677.0" font-size="13" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message</text></svg></div>
+<h2>Level-0 data flow diagram</h2><div class="dia"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1460 1100" width="100%" style="font-family:Georgia,'Times New Roman',serif;background:#fff" role="img"><title>Level-0 DFD – Set Match system</title><defs><marker id="ah_level0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2b1d22"/></marker></defs><rect width="1460" height="1100" fill="#fff"/><rect x="30" y="30" width="160" height="1040" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><rect x="1270" y="30" width="160" height="1040" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><circle cx="640" cy="90" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="640" cy="240" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="640" cy="390" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="640" cy="540" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="640" cy="690" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="640" cy="840" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="640" cy="990" r="54" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><path d="M1110 145 H900 V185 H1110 M940 145 V185" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="901" y="146" width="209" height="38" fill="#fff8f0" stroke="none"/><path d="M1110 145 H900 V185 H1110 M940 145 V185" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M1110 295 H900 V335 H1110 M940 295 V335" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="901" y="296" width="209" height="38" fill="#fff8f0" stroke="none"/><path d="M1110 295 H900 V335 H1110 M940 295 V335" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M1110 445 H900 V485 H1110 M940 445 V485" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="901" y="446" width="209" height="38" fill="#fff8f0" stroke="none"/><path d="M1110 445 H900 V485 H1110 M940 445 V485" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M1110 595 H900 V635 H1110 M940 595 V635" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="901" y="596" width="209" height="38" fill="#fff8f0" stroke="none"/><path d="M1110 595 H900 V635 H1110 M940 595 V635" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M1110 745 H900 V785 H1110 M940 745 V785" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="901" y="746" width="209" height="38" fill="#fff8f0" stroke="none"/><path d="M1110 745 H900 V785 H1110 M940 745 V785" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M190.0 82.0 L586.0 82.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M587.0 98.0 L190.0 98.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M586.0 240.0 L190.0 240.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M190.0 382.0 L586.0 382.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M587.0 398.0 L190.0 398.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M586.0 540.0 L190.0 540.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M190.0 682.0 L586.0 682.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M587.0 698.0 L190.0 698.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M190.0 832.0 L586.0 832.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M587.0 848.0 L190.0 848.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M586.0 990.0 L190.0 990.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M1270.0 240.0 L694.0 240.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M1270.0 532.0 L694.0 532.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M693.0 548.0 L1270.0 548.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M1270.0 832.0 L694.0 832.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M693.0 848.0 L1270.0 848.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M694.0 990.0 L1270.0 990.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M907.7 145.0 L692.9 100.9" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M692.9 250.9 L907.7 295.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M907.7 335.0 L692.9 379.1" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M691.4 406.7 L900.0 449.6" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M937.5 445.0 L693.8 394.9" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M693.8 535.1 L937.5 485.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M900.0 480.4 L691.4 523.3" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M691.4 556.7 L900.0 599.6" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M937.5 595.0 L693.8 544.9" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M693.0 684.0 L985.0 684.0 L985.0 636.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M693.8 835.1 L937.5 785.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M900.0 780.4 L691.4 823.3" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M676.0 650.0 L900.0 478.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M684.0 422.0 L770.0 626.0 L900.0 626.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M1110.0 155.0 L1150.0 155.0 L1150.0 712.0 L690.0 712.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M1110.0 175.0 L1200.0 175.0 L1200.0 956.0 L684.0 956.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><path d="M1110.0 625.0 L1175.0 625.0 L1175.0 1012.0 L686.0 1012.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level0)"/><text x="110.0" y="550.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Client</text><text x="1350.0" y="550.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Nail Tech</text><text x="640.0" y="72.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">1.0</text><text x="640.0" y="90.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Match</text><text x="640.0" y="106.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">service</text><text x="640.0" y="222.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">2.0</text><text x="640.0" y="240.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Manage</text><text x="640.0" y="256.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">availability</text><text x="640.0" y="372.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">3.0</text><text x="640.0" y="390.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Submit</text><text x="640.0" y="406.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">request</text><text x="640.0" y="522.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">4.0</text><text x="640.0" y="540.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Review</text><text x="640.0" y="556.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">requests</text><text x="640.0" y="672.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">5.0</text><text x="640.0" y="690.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Update</text><text x="640.0" y="706.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">appointment</text><text x="640.0" y="822.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">6.0</text><text x="640.0" y="840.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Exchange</text><text x="640.0" y="856.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">messages</text><text x="640.0" y="972.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">7.0</text><text x="640.0" y="990.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Report</text><text x="640.0" y="1006.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">appointments</text><text x="920.0" y="165.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D1</text><text x="948.0" y="165.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Services</text><text x="920.0" y="315.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D2</text><text x="948.0" y="315.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Availability</text><text x="920.0" y="465.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D4</text><text x="948.0" y="465.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Clients</text><text x="920.0" y="615.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D3</text><text x="948.0" y="615.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointments</text><text x="920.0" y="765.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D5</text><text x="948.0" y="765.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Messages</text><text x="388.0" y="68.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Matcher answers</text><text x="388.0" y="112.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Recommendation + price</text><text x="388.0" y="227.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Open time slots</text><text x="388.0" y="368.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointment request</text><text x="388.0" y="412.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Request status / rule error</text><text x="388.0" y="527.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Updated status</text><text x="388.0" y="668.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Add-ons, special requests, cancellation</text><text x="388.0" y="712.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Estimated total, late-cancel warning</text><text x="388.0" y="818.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message</text><text x="388.0" y="862.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message thread</text><text x="388.0" y="977.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Service menu, My Appointments</text><text x="1030.0" y="227.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Open time slots</text><text x="1010.0" y="518.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Decision, deposit received</text><text x="1010.0" y="562.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Pending requests, deposit flags, rule error</text><text x="1030.0" y="818.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message</text><text x="1030.0" y="862.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Message thread</text><text x="1030.0" y="977.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Dashboard summary</text><text x="802.1" y="114.1" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(11.6 802.1 114.1)">Service details</text><text x="798.5" y="281.8" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(11.6 798.5 281.8)">Time slots</text><text x="798.5" y="348.2" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-11.6 798.5 348.2)">Slot availability</text><text x="804.3" y="439.1" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(11.6 804.3 439.1)">Pending count</text><text x="805.3" y="408.6" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(11.6 805.3 408.6)">Pending count, deposit flag</text><text x="797.9" y="522.9" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-11.6 797.9 522.9)">Deposit cleared</text><text x="810.6" y="489.6" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-11.6 810.6 489.6)">Deposit flag</text><text x="818.9" y="592.1" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(11.6 818.9 592.1)">Status update</text><text x="788.2" y="555.1" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(11.6 788.2 555.1)">Pending requests, request status</text><text x="840.0" y="673.0" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointment changes</text><text x="817.4" y="818.9" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-11.6 817.4 818.9)">Message</text><text x="793.9" y="793.1" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-11.6 793.9 793.1)">Message thread</text><text x="712.0" y="622.0" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-43.0 712.0 622.0)">Deposit flag</text><text x="838.0" y="640.0" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">New request</text><text x="840.0" y="723.0" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Removal prices</text><text x="1191.0" y="905.0" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-90.0 1191.0 905.0)">Service menu</text><text x="1000.0" y="1024.0" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointment records</text></svg></div>
+<h2>Level-1: 3.0 Submit request</h2><div class="dia"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 960" width="100%" style="font-family:Georgia,'Times New Roman',serif;background:#fff" role="img"><title>Level-1 DFD – 3.0 Submit request</title><defs><marker id="ah_level1_3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2b1d22"/></marker></defs><rect width="1000" height="960" fill="#fff"/><rect x="380" y="30" width="240" height="70" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><circle cx="500" cy="220" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="500" cy="400" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="500" cy="580" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="500" cy="760" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><path d="M500.0 100.0 L500.0 162.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M500.0 278.0 L500.0 342.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M500.0 458.0 L500.0 522.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M500.0 638.0 L500.0 702.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M442.0 220.0 L300.0 220.0 L300.0 91.0 L380.0 91.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M442.0 400.0 L260.0 400.0 L260.0 74.0 L380.0 74.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M442.0 580.0 L220.0 580.0 L220.0 57.0 L380.0 57.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M442.0 760.0 L180.0 760.0 L180.0 40.0 L380.0 40.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M950 380 H720 V420 H950 M760 380 V420" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="721" y="381" width="229" height="38" fill="#fff8f0" stroke="none"/><path d="M950 380 H720 V420 H950 M760 380 V420" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M950 650 H720 V690 H950 M760 650 V690" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="721" y="651" width="229" height="38" fill="#fff8f0" stroke="none"/><path d="M950 650 H720 V690 H950 M760 650 V690" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M950 840 H720 V880 H950 M760 840 V880" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="721" y="841" width="229" height="38" fill="#fff8f0" stroke="none"/><path d="M950 840 H720 V880 H950 M760 840 V880" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M720.0 400.0 L558.0 400.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M760.6 650.0 L556.0 595.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M556.0 745.0 L760.6 690.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><path d="M555.6 776.6 L768.0 840.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_3)"/><text x="500.0" y="65.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Client</text><text x="500.0" y="202.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">3.1</text><text x="500.0" y="220.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Validate</text><text x="500.0" y="236.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">details</text><text x="500.0" y="382.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">3.2</text><text x="500.0" y="400.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Check</text><text x="500.0" y="416.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">slot</text><text x="500.0" y="562.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">3.3</text><text x="500.0" y="580.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Check client</text><text x="500.0" y="596.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">limits</text><text x="500.0" y="742.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">3.4</text><text x="500.0" y="760.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Save pending</text><text x="500.0" y="776.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">request</text><text x="512.0" y="131.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointment request</text><text x="512.0" y="310.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Valid request</text><text x="512.0" y="490.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Slot-confirmed request</text><text x="512.0" y="670.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Approved request</text><text x="370.0" y="209.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Rule error</text><text x="370.0" y="389.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Rule error</text><text x="370.0" y="569.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Rule error</text><text x="330.0" y="749.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Request status (Pending)</text><text x="740.0" y="400.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D2</text><text x="768.0" y="400.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Availability</text><text x="740.0" y="670.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D4</text><text x="768.0" y="670.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Clients</text><text x="740.0" y="860.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D3</text><text x="768.0" y="860.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointments</text><text x="639.0" y="391.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Slot availability</text><text x="660.6" y="613.8" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(15.0 660.6 613.8)">Pending count, deposit flag</text><text x="660.6" y="726.2" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-15.0 660.6 726.2)">Pending count</text><text x="659.2" y="816.9" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(16.6 659.2 816.9)">New request</text><text x="500.0" y="925.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#6b5560">Checks: 3.1 = blanks, BR-1 (24 hrs), BR-3 (30 days) · 3.2 = BR-4 (open slot) · 3.3 = BR-2 (max 2 pending), BR-5 (deposit flag)</text></svg></div>
+<h2>Level-1: 4.0 Review requests</h2><div class="dia"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1020" width="100%" style="font-family:Georgia,'Times New Roman',serif;background:#fff" role="img"><title>Level-1 DFD – 4.0 Review requests</title><defs><marker id="ah_level1_4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2b1d22"/></marker></defs><rect width="1000" height="1020" fill="#fff"/><rect x="380" y="30" width="240" height="70" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><circle cx="500" cy="210" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="500" cy="400" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="500" cy="600" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><circle cx="500" cy="790" r="58" fill="#fbf1f3" stroke="#2b1d22" stroke-width="1.6"/><rect x="380" y="900" width="240" height="70" fill="#fff" stroke="#2b1d22" stroke-width="1.8"/><path d="M500.0 152.0 L500.0 100.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M380.0 88.0 L300.0 88.0 L300.0 400.0 L442.0 400.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M380.0 66.0 L250.0 66.0 L250.0 588.0 L445.0 588.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M445.0 612.0 L200.0 612.0 L200.0 44.0 L380.0 44.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M500.0 658.0 L500.0 732.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M500.0 848.0 L500.0 900.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M950 290 H720 V330 H950 M760 290 V330" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="721" y="291" width="229" height="38" fill="#fff8f0" stroke="none"/><path d="M950 290 H720 V330 H950 M760 290 V330" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M950 690 H720 V730 H950 M760 690 V730" fill="#fff8f0" stroke="#2b1d22" stroke-width="1.6"/><rect x="721" y="691" width="229" height="38" fill="#fff8f0" stroke="none"/><path d="M950 690 H720 V730 H950 M760 690 V730" fill="none" stroke="#2b1d22" stroke-width="1.6"/><path d="M768.0 290.0 L555.6 226.6" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M556.0 385.0 L760.6 330.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M811.9 330.0 L543.9 562.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M774.1 690.0 L555.1 618.1" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M556.4 776.5 L751.2 730.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><path d="M950.0 700.0 L975.0 700.0 L975.0 196.0 L558.0 196.0" fill="none" stroke="#2b1d22" stroke-width="1.4" marker-end="url(#ah_level1_4)"/><text x="500.0" y="65.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Nail Tech</text><text x="500.0" y="192.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">4.1</text><text x="500.0" y="210.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Show pending</text><text x="500.0" y="226.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">requests</text><text x="500.0" y="382.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">4.2</text><text x="500.0" y="400.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Record</text><text x="500.0" y="416.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">deposit</text><text x="500.0" y="582.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">4.3</text><text x="500.0" y="600.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Check</text><text x="500.0" y="616.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">decision</text><text x="500.0" y="772.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">4.4</text><text x="500.0" y="790.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Update</text><text x="500.0" y="806.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">status</text><text x="500.0" y="935.0" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">Client</text><text x="512.0" y="126.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Pending requests, deposit flags</text><text x="372.0" y="389.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Deposit received</text><text x="360.0" y="577.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Decision</text><text x="330.0" y="625.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Rule error</text><text x="512.0" y="695.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Valid decision</text><text x="512.0" y="874.0" font-size="12" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Updated status</text><text x="740.0" y="310.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D4</text><text x="768.0" y="310.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Clients</text><text x="740.0" y="710.0" font-size="13" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#2b1d22">D3</text><text x="768.0" y="710.0" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Appointments</text><text x="664.4" y="249.7" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(16.6 664.4 249.7)">Deposit flag</text><text x="660.6" y="366.2" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-15.0 660.6 366.2)">Deposit cleared</text><text x="645.2" y="462.4" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-40.9 645.2 462.4)">Deposit flag</text><text x="667.4" y="645.5" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(18.2 667.4 645.5)">Request status</text><text x="655.9" y="762.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22" transform="rotate(-13.4 655.9 762.0)">Status update</text><text x="800.0" y="184.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#2b1d22">Pending requests</text><text x="500.0" y="995.0" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#6b5560">Checks: 4.3 = BR-6 (only Pending can be approved or declined) and BR-5 (deposit must be marked received before approval)</text></svg></div>
+</div>
+<p class="req">This is a prototype for a class project. All names and data are made up. No real payments are processed.</p>
+</template>
+</body>
+</html>
